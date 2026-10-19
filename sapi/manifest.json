@@ -4,8 +4,6 @@
   "id": "data-backup",
   "name": "数据备份",
   "configKey": "data_backup",
-  "enabledByDefault": true,
-  "canDisable": false,
   "requires": [],
   "permissions": [
     "config:read:data_backup",
