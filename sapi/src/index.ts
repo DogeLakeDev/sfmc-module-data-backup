@@ -60,6 +60,7 @@ let scoreRunId: number | undefined;
 let playerReconcileInterval = 6000;
 let scoreEnabled = true;
 let scoreInterval = 6000;
+/** 恢复排除名单：仅在 restoreScoreboard 时跳过这些 objective；快照与查询全量。 */
 let ignoreObjectives: string[] = [...DEFAULT_IGNORE];
 let latestSnapshotId = "";
 const backupTasks = new BackupTaskQueue();
@@ -225,8 +226,8 @@ async function snapshotScoreboards(): Promise<string> {
   const snapshotId = newSnapshotId();
   const rows: ScoreRow[] = [];
   const now = Date.now();
+  // 全量快照所有计分板，不区分归属模块。
   for (const obj of world.scoreboard.getObjectives()) {
-    if (shouldIgnoreObjective(obj.id, ignoreObjectives)) continue;
     for (const participant of obj.getParticipants()) {
       const score = obj.getScore(participant);
       if (score === undefined) continue;
@@ -395,10 +396,8 @@ ModuleRegistry.register({
         if (typeof sc.interval_ticks === "number" && sc.interval_ticks > 0) {
           scoreInterval = sc.interval_ticks;
         }
-        if (
-          Array.isArray(sc.ignore_objectives) &&
-          sc.ignore_objectives.length
-        ) {
+        // 允许显式配置为空数组，表示恢复时不排除任何计分板。
+        if (Array.isArray(sc.ignore_objectives)) {
           ignoreObjectives = sc.ignore_objectives.map(String);
         }
       }
@@ -522,7 +521,6 @@ ModuleRegistry.register({
                 : undefined,
               limit: 50000,
             });
-            rows = filterScoreRows(rows, ignoreObjectives);
             if (typeof input.objective === "string") {
               rows = rows.filter((r) => r.objective === input.objective);
             }
@@ -581,7 +579,7 @@ ModuleRegistry.register({
 
       debug.i(
         "BACKUP",
-        `init playerReconcile=${playerReconcileInterval} score=${scoreInterval} ignore=${ignoreObjectives.join(",")}`,
+        `init playerReconcile=${playerReconcileInterval} score=${scoreInterval} restoreIgnore=${ignoreObjectives.join(",")}`,
       );
     },
     cleanup() {

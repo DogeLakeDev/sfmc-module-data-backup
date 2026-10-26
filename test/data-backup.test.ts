@@ -7,16 +7,27 @@ import {
 } from "../sapi/src/backup-policy.js";
 
 describe("data-backup ignore", () => {
-  it("默认排除 sfmc_money", () => {
-    assert.equal(shouldIgnoreObjective("sfmc_money"), true);
+  it("默认不排除任何计分板", () => {
+    assert.equal(shouldIgnoreObjective("sfmc_money"), false);
     assert.equal(shouldIgnoreObjective("sfmc_level"), false);
   });
 
-  it("filterScoreRows", () => {
+  it("filterScoreRows 默认全量保留", () => {
     const rows = filterScoreRows([
       { objective: "sfmc_money", score: 1 },
       { objective: "kills", score: 2 },
     ]);
+    assert.equal(rows.length, 2);
+  });
+
+  it("filterScoreRows 按显式名单排除", () => {
+    const rows = filterScoreRows(
+      [
+        { objective: "sfmc_money", score: 1 },
+        { objective: "kills", score: 2 },
+      ],
+      ["sfmc_money"],
+    );
     assert.equal(rows.length, 1);
     assert.equal(rows[0]?.objective, "kills");
   });
