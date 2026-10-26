@@ -1,11 +1,11 @@
 {
   "name": "@sfmc-bds/module-data-backup",
-  "version": "0.2.2",
-  "packageManager": "pnpm@10.8.0",
+  "version": "0.3.0",
+  "packageManager": "pnpm@12.15.0",
   "type": "module",
   "description": "SAPI module: 世界与计分板灾备",
   "license": "ISC",
-  "repository": "git+https://github.com/Tanya7z/sfmc-module-data-backup.git",
+  "repository": "git+https://github.com/DogeLake/sfmc-module-data-backup.git",
   "main": "sapi/src/index.ts",
   "exports": {
     ".": "./sapi/src/index.ts"
